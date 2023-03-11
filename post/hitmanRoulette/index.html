@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+        <head>
+        <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1,initial-scale=1,user-scalable=no" />
+        <meta charset="utf-8">
+        <title>杀手转盘功能使用说明 | NatholDallas&#39;s Blog</title>
+        <link rel="stylesheet" href="https://natholdallas.github.io/styles/main.css">
+        <link rel="stylesheet" href="https://at.alicdn.com/t/font_1306644_jwtuc2zzbrd.css">
+        <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+        <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
+         <script src="https://cdn.bootcss.com/highlight.js/9.15.10/highlight.min.js"></script>
+         <script >hljs.initHighlightingOnLoad();</script>
+
+    </head>
+    <body>
+              <header class="header mdui-m-b-5">      
+            <div class="container  ">
+                <div class="index-title animated fadeInDown mdui-text-center mdui-text-color-white mdui-m-b-2" style="animation-delay: 0.2s"><a href="https://natholdallas.github.io">NatholDallas&#39;s Blog</a></div>
+                <div class="mdui-text-color-white animated fadeInDown mdui-text-center  mdui-m-b-3" style="animation-delay: 0.4s">富豪白兰地的博客</div>
+           
+            <nav id="nav" class="mdui-text-center animated fadeInDown" style="animation-delay: 0.6s">
+                   
+                            <li><a href="https://natholdallas.github.io">首页</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                            <li><a href="https://natholdallas.github.io/tags">分类</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                            <li><a href="https://natholdallas.github.io/archives">归档</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                            <li><a href="https://natholdallas.github.io/post/sort">目录</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                            <li><a href="https://natholdallas.github.io/post/about">关于</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                  </nav>
+                </div>
+        </header>
+        <div class="mdui-container ">
+                <div class="mdui-row">
+                        <div class="mdui-col-md-8 mdui-col-offset-md-2 ">
+                                <article class="mdui-p-a-2 post animated fadeIn" style="animation-delay: 0.8s;animation-duration: 2s">
+                                    <div class="post-title  mdui-m-b-1">杀手转盘功能使用说明</div>
+                                    <div class="mdui-typo-body-2 mdui-m-b-2" datetime="2023-01-12 21:52:55">2023-01-12 / 4 min read</div>
+                                    <div class="mdui-m-b-2 mdui-typo post-neirong"><blockquote>
+<p>引言<br>
+由于<a href="https://hitmaps.readme.io/">hitmaps</a>的API文档有部分的BUG原因<br>
+部分功能可能无法具体的实现<br>
+例如:<br>
+无法在升级契约中的地图开启转盘<br>
+<s>转盘中定义特殊伪装无法生效</s> 现已修复</p>
+</blockquote>
+<h2 id="使用手册">📊 使用手册</h2>
+<h3 id="命令行的了解">命令行的了解</h3>
+<p>在 Kook 中,你需要通过 <code>/shake</code> 命令使用轮盘功能<br>
+你可以定制多种转盘格式:</p>
+<blockquote>
+<p>生成完全随机的转盘<br>
+生成指定的地图转盘<br>
+生成详细的参数,定义特殊条件,指定某一个地图的转盘</p>
+</blockquote>
+<p><code>shake</code> 的后面可以跟上许多的参数,他的具体参数如下:</p>
+<blockquote>
+<p>/shake 地图名称 特殊条件 特殊条件 ......<br>
+地图名称 : 如巴黎中的精彩表演,直接填写<strong>精彩表演</strong>即可<br>
+特殊条件 : 如<strong>特定伪装</strong>,<strong>近战击杀</strong>,<strong>事故击杀</strong><br>
+注释:<br>
+<code>特定伪装</code>-此条件现已修复,可以正常使用此条件<br>
+<code>附加目标</code>-添加主要任务中的其他目标,如明日世界中的DNA病毒样本</p>
+</blockquote>
+<p>示例命令如下:</p>
+<pre><code class="language-Kook">随机生成
+/shake
+指定地图
+/shake 精彩表演
+精准定制
+/shake 明日世界 近战击杀 目标伪装 通用杀戮
+</code></pre>
+<h3 id="地图名称">地图名称</h3>
+<p>由于地图的名称过多,因此在这里站长把所有的<strong>地图名称</strong>参数都枚举出来,供大家参考</p>
+<pre><code class="language-json">[
+&quot;自由训练&quot;,
+&quot;最终测试&quot;,
+&quot;精彩表演&quot;,
+&quot;明日世界&quot;,
+&quot;偶像&quot;,
+&quot;山崩&quot;,
+&quot;作家&quot;,
+&quot;镀金笼子&quot;,
+&quot;沙上之屋&quot;,
+&quot;27俱乐部&quot;,
+&quot;起源&quot;,
+&quot;自由战士&quot;,
+&quot;内脏逆位&quot;,
+&quot;北海道冰雪&quot;,
+&quot;零号病人&quot;,
+&quot;夜之呼唤&quot;,
+&quot;终点线&quot;,
+&quot;巧舌如簧&quot;,
+&quot;三头蛇&quot;,
+&quot;巨蛇之拥&quot;,
+&quot;捕风捉影&quot;,
+&quot;壮丽幻像&quot;,
+&quot;往生&quot;,
+&quot;苦药&quot;,
+&quot;方舟会&quot;,
+&quot;离职补贴&quot;,
+&quot;最后手段&quot;,
+&quot;世界之巅&quot;,
+&quot;家破人亡&quot;,
+&quot;顶级掠食者&quot;,
+&quot;时代的终结&quot;,
+&quot;道别&quot;,
+&quot;不可触碰&quot;,
+&quot;水中暗影&quot;
+]
+</code></pre>
+<h3 id="特殊条件">特殊条件</h3>
+<p>由于特殊条件定制的名称大家获取不清楚如何操作,因此这里站长把所有的特殊条件枚举出来,供大家参考</p>
+<pre><code class="language-json">{
+&quot;特定伪装&quot; : &quot;已弃用,由于API文档的BUG,此请求无法生效,用于指定击杀目标时的特定伪装&quot;,
+&quot;近战击杀&quot; : &quot;指定使用致命近战击杀,只会选择地图上的致命近战&quot;,
+&quot;武器击杀&quot; : &quot;指定枪械击杀(消音或未消音)&quot;,
+&quot;事故击杀&quot; : &quot;特定事故击杀,如溺水击杀或触电击杀&quot;,
+&quot;目标杀戮&quot; : &quot;独特的杀戮方式,例如:狙击手-文档中的意思较为模糊&quot;,
+&quot;通用杀戮&quot; : &quot;普通的杀戮方式,例如枪械或事故&quot;,
+&quot;困难杀戮&quot; : &quot;困难的杀戮方式,文档中没有给出具体说明&quot;,
+&quot;附加目标&quot; : &quot;包括其他目标,例如&lt;明日世界&gt;中的DNA病毒原型&quot;,
+&quot;目标伪装&quot; : &quot;为附加目标采取特定的伪装,此请求可以正常工作,无需担心&quot;
+}
+</code></pre>
+</div>
+                                    <div class="mdui-divider mdui-m-b-2"></div>
+                                    <div class="mdui-row-xs-2 post-fenye">
+                                       
+                                        <div class="mdui-col"> <div class="mdui-text-left"><a href="https://natholdallas.github.io/post/upgradeLog/">更新日志</a></div></div>
+                                        
+
+                                        
+                                        <div class="mdui-col"></div>
+                                       
+                                      </div>
+                                   
+                                    <div class="mdui-divider mdui-m-t-2 mdui-m-b-2"></div>
+                                    
+                                     <script src="https://natholdallas.github.io/media/scripts/Valine.min.js"></script>
+ <div class="comment"></div>
+
+<script>
+      new Valine({
+            el: '.comment',
+
+
+
+            path: window.location.pathname,
+            pageSize: 30,
+            avatar:'mm', 
+       })
+    </script> 
+<script>
+    if(window.location.hash){
+        var checkExist = setInterval(function() {
+           if ($(window.location.hash).length) {
+              $('html, body').animate({scrollTop: $(window.location.hash).offset().top-90}, 1000);
+              clearInterval(checkExist);
+           }
+        }, 100);
+    }
+</script>
+                                </article>
+
+                                    
+                        </div>
+                      </div>
+    
+                
+
+              </div>
+                    <footer class="footer mdui-m-t-5 mdui-text-center">
+               <nav class="social-links">
+                      <ul>
+                      
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      </ul>
+                    </nav>
+                    <div class="copyright">
+                      <p>本站是由 <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> 生成的博客 <br/> Theme <a href="https://github.com/alterfang/gridea-theme-song/" target="_blank"  title="宋"  >Song</a> by <a href="https://shanbu.fun/" target="_blank"  title="山卜方" >shanbufun</a> </p>
+                  </div>
+                  
+              </footer>
+    </body>
+</html>

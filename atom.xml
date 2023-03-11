@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://natholdallas.github.io</id>
+    <title>NatholDallas&apos;s Blog</title>
+    <updated>2023-03-11T06:11:39.382Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://natholdallas.github.io"/>
+    <link rel="self" href="https://natholdallas.github.io/atom.xml"/>
+    <subtitle>富豪白兰地的博客</subtitle>
+    <logo>https://natholdallas.github.io/images/avatar.png</logo>
+    <icon>https://natholdallas.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2023, NatholDallas&apos;s Blog</rights>
+    <entry>
+        <title type="html"><![CDATA[Mybatis框架学习-入门]]></title>
+        <id>https://natholdallas.github.io/post/mybatis-example/</id>
+        <link href="https://natholdallas.github.io/post/mybatis-example/">
+        </link>
+        <updated>2023-03-09T02:00:00.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="mybatis-入门自整合">Mybatis 入门自整合</h1>
+<h2 id="引言">引言</h2>
+<blockquote>
+<p>本篇的文章主要依赖于mybatis提供的官方文档,因此本篇注重讲解的部分为<br>
+解读官方文档提供的示例代码,以避免在使用示例代码的过程中出现错误</p>
+</blockquote>
+<hr>
+<h2 id="准备工作">准备工作</h2>
+<p>我们需要准备的很简单,创建一个maven项目,主类由你自己定义,这里为了演示,我将把<br>
+项目结构列出</p>
+<pre><code class="language-ascii">java
+  nathol
+    mybatis
+      example
+        Main.java(class)
+        mapper
+          User.java(class)
+          UserMapper.java(interface)
+resources
+  mybatis-config.xml
+  mappers
+    UserMapper.xml
+</code></pre>
+<p>并且本次使用到的示例数据库为MySQL,因此需要给数据库提前创建一个表</p>
+<pre><code class="language-sql">create table User(
+  id int not null unique,
+  username varchar(50),
+  password varchar(50)
+)
+</code></pre>
+<p>Maven导入-Mybatis框架</p>
+<pre><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.mybatis&lt;/groupId&gt;
+  &lt;artifactId&gt;mybatis&lt;/artifactId&gt;
+  &lt;version&gt;x.x.x&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<hr>
+<h2 id="疑问解答">疑问解答</h2>
+<p>在官方文档中给出的第一个构建方式是在XML中构建SqlSessionFactory<br>
+接下来让我们编写一下:</p>
+<pre><code class="language-java">InputStream inputStream = Resources.getResourceAsStream(&quot;mybatis-config.xml&quot;);
+SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+</code></pre>
+<p>这是Java代码中的<code>String resource</code>中指向的文件路径中的<code>mybatis-config.xml</code></p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;!DOCTYPE configuration
+  PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;
+  &quot;https://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;
+&lt;configuration&gt;
+  &lt;environments default=&quot;development&quot;&gt;
+    &lt;environment id=&quot;development&quot;&gt;
+      &lt;transactionManager type=&quot;JDBC&quot;/&gt;
+      &lt;dataSource type=&quot;POOLED&quot;&gt;
+        &lt;property name=&quot;driver&quot; value=&quot;com.mysql.jdbc.Driver&quot;/&gt;
+        &lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://localhost/Example&quot;/&gt;
+        &lt;property name=&quot;username&quot; value=&quot;root&quot;/&gt;
+        &lt;property name=&quot;password&quot; value=&quot;123456&quot;/&gt;
+      &lt;/dataSource&gt;
+    &lt;/environment&gt;
+  &lt;/environments&gt;
+  &lt;mappers&gt;
+    &lt;mapper resource=&quot;mappers/UserMapper.xml&quot;/&gt;
+  &lt;/mappers&gt;
+&lt;/configuration&gt;
+</code></pre>
+<p>其中有非常多的疑问,我将把他们分为<code>4</code>个模块,分别是</p>
+<ul>
+<li>资源获取问题</li>
+<li>核心配置文件</li>
+<li>Mappers元素中的Mapper(Resources指向的文件内容)</li>
+<li>在Java代码中与XML文件进行关联之后的操作</li>
+</ul>
+<h3 id="module1-资源获取问题">Module.1 资源获取问题</h3>
+<p>在大部分情况下,我们会将资源文件放入java项目中的<code>resources</code>包中<br>
+<code>resources</code>中的内容在编译后从根本上来说它是直接一起打包入Jar目录中</p>
+<p>在传统意义上获得resources的情况下<br>
+我们需要获取class去调用<code>getResources()</code>和<code>getResourceAsStream()</code><br>
+这两个与Mybatis提供的<code>Resources</code>类在用法上有一丝差异<br>
+例如我们想获取<code>resources</code>文件夹根目录下的<code>mybatis-config.xml</code>文件</p>
+<h5 id="resources">Resources</h5>
+<pre><code class="language-java">InputStream inputStream = Resources.getResourceAsStream(&quot;mybatis-config.xml&quot;);
+</code></pre>
+<h5 id="classgetresourcesgetresourceasstream">Class.getResources()/getResourceAsStream()</h5>
+<pre><code class="language-java">public class Main{
+  public static void main(String[] args) {
+    Class&lt;Main&gt; main = Main.class;
+    URL url = main.getResources(&quot;/mybatis-config.xml&quot;);
+    InputStream inputStream = main.getResourceAsStream(&quot;/mybatis-config.xml&quot;);
+  }
+}
+</code></pre>
+<p>从简单易懂的层面来说,他帮您省了一个<code>/</code>,并且帮你省去了获取Class的过程<br>
+重点在于:我们需要知道,在示例代码中,这个Resources获取的方式,是由Mybatis框架提供的类与方法,而不推荐通过原生的方式去获取资源文件</p>
+<h3 id="module2-核心配置文件">Module.2 核心配置文件</h3>
+<p>让我们来解读一下<code>mybatis-config.xml</code>文件中的示例代码<br>
+并列出6个标签分析,它们分别是</p>
+<h5 id="doctype里面声明了什么">DOCTYPE里面声明了什么?</h5>
+<blockquote>
+<p>简易的来说,他只是一个校验xml正确性的方式<br>
+通过在<a href="https://mybatis.org">Mybatis</a>中挂载的校验文件<code>mybatis-3-config.dtd</code><br>
+我们不需要去了解其中的原理,只需要了解即可</p>
+</blockquote>
+<h5 id="environments标签说明了什么">environments标签说明了什么?</h5>
+<blockquote>
+<p><code>environment</code>元素体中包含了事务管理和连接池的配置,因此它可以配置多个连接</p>
+</blockquote>
+<h5 id="transactionmanager标签中的type的参数是什么">transactionManager标签中的type的参数是什么?</h5>
+<blockquote>
+<p>声明了在单个连接配置中的连接方式,这里为他设置了JDBC驱动连接</p>
+</blockquote>
+<h5 id="datasource标签中的type中的参数是什么">dataSource标签中的type中的参数是什么?</h5>
+<blockquote>
+<p>声明了在单个连接配置中的连接池类型<br>
+<code>POOLED</code> 采用<code>javax.sql.DataSource</code>接口实现<br>
+<code>UNPOOLED</code> 虽然也采用<code>javax.sql.DataSource</code>接口实现,但并没有使用池的思想<br>
+<code>JNDI</code> 采用服务器提供<code>JNDI</code>技术实现来获取DataSource对象<br>
+不同服务器的DataSource不一样,如tomcat服务器采用的连接池是dbcp连接池</p>
+</blockquote>
+<p>注: 如果不是web或者maven的war工程,是不能使用的</p>
+<h5 id="property中的配置">property中的配置</h5>
+<p>在连接配置中,必不可少的是property配置,但里面的参数我们需要详细了解一下<br>
+最常用的四个property组合的配置:</p>
+<pre><code class="language-xml">&lt;!--定义一个驱动,如使用mysql驱动com.mysql.jdbc.Driver--&gt;
+&lt;property name=&quot;driver&quot; value=&quot;${driver}&quot;/&gt;
+&lt;!--定义地址,如使用本地连接jdbc:mysql://localhost:3306/Example--&gt;
+&lt;property name=&quot;url&quot; value=&quot;${url}&quot;/&gt;
+&lt;!--代表数据库中的用户名称,如root--&gt;
+&lt;property name=&quot;username&quot; value=&quot;${username}&quot;/&gt;
+&lt;!--代表数据库中的用户名称对应的密码,如123456--&gt;
+&lt;property name=&quot;password&quot; value=&quot;${password}&quot;/&gt;
+</code></pre>
+<h5 id="mappers-中表达了什么">mappers 中表达了什么?</h5>
+<p><code>mappers</code>元素包含了一组映射器(mapper)<br>
+这些映射器的XML映射文件包含了SQL代码和映射定义信息</p>
+<p>至此,对于XML核心配置文件的讲解就结束了,XML配置的方式是最常用的,也是最实用<br>
+因此,如果你需要完成一个大的工程,使用XML配置方式是最好的选择</p>
+<h3 id="module3-mappers元素中的mapperresource指向的文件内容">Module.3 Mappers元素中的Mapper(Resource指向的文件内容)</h3>
+<p>我们在观察Mappers元素中的时候得知它是一组映射器,这些映射器就是包含SQL代码和映射的定义信息<br>
+因此我们在Java项目中定义了两个类</p>
+<p>User.java<br>
+<code>在源码包根目录下创建mapper软件包,在里面创建User类</code></p>
+<pre><code class="language-java">public class User{
+  int id;
+  String username;
+  String password;
+
+  public void setId(int id) {
+    this.id = id;
+  }
+  public String getId() {
+    return id;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+  public String getUsername() {
+    return username;
+  }
+  
+  public void setPassword(String password) {
+    this.password = password;
+  }
+  public String getPassword() {
+    return password;
+  }
+}
+</code></pre>
+<p>UserMapper.java<br>
+在<code>源码包根目录创建一个mapper软件包,在里面创建UserMapper类</code></p>
+<pre><code class="language-java">public interface UserMapper{
+  User selectUser(int id);
+}
+</code></pre>
+<p>新建完两个类之后,我们在<code>resources</code>根目录下创建mappers目录<br>
+并在其目录中创建<code>UserMapper.xml</code>的映射文件<br>
+并且我们需要在<code>mybatis-config.xml</code>中配置资源以指向此文件</p>
+<p>mybatis-config.xml</p>
+<pre><code class="language-xml">&lt;mappers&gt;
+  &lt;mapper resource=&quot;mappers/UserMapper.xml&quot;/&gt;
+&lt;/mappers&gt;
+</code></pre>
+<p>UserMapper.xml</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;!DOCTYPE mapper
+  PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+  &quot;https://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+&lt;mapper namespace=&quot;nathol.mybatis.example.mapper.UserMapper&quot;&gt;
+  &lt;select id=&quot;selectUser&quot; resultType=&quot;User&quot;&gt;
+    select * from User where id = #{id}
+  &lt;/select&gt;
+&lt;/mapper&gt;
+</code></pre>
+<h5 id="usermapperxml中的doctype声明了什么">UserMapper.xml中的DOCTYPE声明了什么?</h5>
+<h5 id="mapper标签中的namespace是什么">mapper标签中的namespace是什么?</h5>
+<h5 id="select标签中的id和resulttype是什么">select标签中的id和resultType是什么?</h5>
+<h3 id="module4-在java代码中与xml文件进行关联之后的操作">Module.4 在Java代码中与XML文件进行关联之后的操作</h3>
+<p>在我们配置好XML文件后,使用Java代码通过Mybatis框架提供的<code>Resources</code>工具类获取到XML文件的<code>InputStream</code>流,到这里,你的入门阶段就已经踏入了,接下来我们来看看如何进行后续操作</p>
+<pre><code class="language-java">public class Main{
+  public static void main(String[] args) {
+    InputStream inputStream = Resources.getResourceAsStream(&quot;mybatis-config.xml&quot;);
+    SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+    try(SqlSession session = sqlSessionFactory.openSession()) {
+      Blog blog = (Blog) session.selectOne(&quot;&quot;, 101);
+    }
+  }
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[博客开发人员]]></title>
+        <id>https://natholdallas.github.io/post/developers/</id>
+        <link href="https://natholdallas.github.io/post/developers/">
+        </link>
+        <updated>2023-03-05T18:08:07.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="developers">Developers</h1>
+<blockquote>
+<p>natholdallas - 站长<br>
+目前只有我一人哈哈,网站正在建设中,目前正在考虑需要制作些什么</p>
+</blockquote>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[更新日志]]></title>
+        <id>https://natholdallas.github.io/post/upgradeLog/</id>
+        <link href="https://natholdallas.github.io/post/upgradeLog/">
+        </link>
+        <updated>2023-03-05T18:07:12.000Z</updated>
+        <content type="html"><![CDATA[<p>暂无......</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[杀手转盘功能使用说明]]></title>
+        <id>https://natholdallas.github.io/post/hitmanRoulette/</id>
+        <link href="https://natholdallas.github.io/post/hitmanRoulette/">
+        </link>
+        <updated>2023-01-12T13:52:55.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>引言<br>
+由于<a href="https://hitmaps.readme.io/">hitmaps</a>的API文档有部分的BUG原因<br>
+部分功能可能无法具体的实现<br>
+例如:<br>
+无法在升级契约中的地图开启转盘<br>
+<s>转盘中定义特殊伪装无法生效</s> 现已修复</p>
+</blockquote>
+<h2 id="使用手册">📊 使用手册</h2>
+<h3 id="命令行的了解">命令行的了解</h3>
+<p>在 Kook 中,你需要通过 <code>/shake</code> 命令使用轮盘功能<br>
+你可以定制多种转盘格式:</p>
+<blockquote>
+<p>生成完全随机的转盘<br>
+生成指定的地图转盘<br>
+生成详细的参数,定义特殊条件,指定某一个地图的转盘</p>
+</blockquote>
+<p><code>shake</code> 的后面可以跟上许多的参数,他的具体参数如下:</p>
+<blockquote>
+<p>/shake 地图名称 特殊条件 特殊条件 ......<br>
+地图名称 : 如巴黎中的精彩表演,直接填写<strong>精彩表演</strong>即可<br>
+特殊条件 : 如<strong>特定伪装</strong>,<strong>近战击杀</strong>,<strong>事故击杀</strong><br>
+注释:<br>
+<code>特定伪装</code>-此条件现已修复,可以正常使用此条件<br>
+<code>附加目标</code>-添加主要任务中的其他目标,如明日世界中的DNA病毒样本</p>
+</blockquote>
+<p>示例命令如下:</p>
+<pre><code class="language-Kook">随机生成
+/shake
+指定地图
+/shake 精彩表演
+精准定制
+/shake 明日世界 近战击杀 目标伪装 通用杀戮
+</code></pre>
+<h3 id="地图名称">地图名称</h3>
+<p>由于地图的名称过多,因此在这里站长把所有的<strong>地图名称</strong>参数都枚举出来,供大家参考</p>
+<pre><code class="language-json">[
+&quot;自由训练&quot;,
+&quot;最终测试&quot;,
+&quot;精彩表演&quot;,
+&quot;明日世界&quot;,
+&quot;偶像&quot;,
+&quot;山崩&quot;,
+&quot;作家&quot;,
+&quot;镀金笼子&quot;,
+&quot;沙上之屋&quot;,
+&quot;27俱乐部&quot;,
+&quot;起源&quot;,
+&quot;自由战士&quot;,
+&quot;内脏逆位&quot;,
+&quot;北海道冰雪&quot;,
+&quot;零号病人&quot;,
+&quot;夜之呼唤&quot;,
+&quot;终点线&quot;,
+&quot;巧舌如簧&quot;,
+&quot;三头蛇&quot;,
+&quot;巨蛇之拥&quot;,
+&quot;捕风捉影&quot;,
+&quot;壮丽幻像&quot;,
+&quot;往生&quot;,
+&quot;苦药&quot;,
+&quot;方舟会&quot;,
+&quot;离职补贴&quot;,
+&quot;最后手段&quot;,
+&quot;世界之巅&quot;,
+&quot;家破人亡&quot;,
+&quot;顶级掠食者&quot;,
+&quot;时代的终结&quot;,
+&quot;道别&quot;,
+&quot;不可触碰&quot;,
+&quot;水中暗影&quot;
+]
+</code></pre>
+<h3 id="特殊条件">特殊条件</h3>
+<p>由于特殊条件定制的名称大家获取不清楚如何操作,因此这里站长把所有的特殊条件枚举出来,供大家参考</p>
+<pre><code class="language-json">{
+&quot;特定伪装&quot; : &quot;已弃用,由于API文档的BUG,此请求无法生效,用于指定击杀目标时的特定伪装&quot;,
+&quot;近战击杀&quot; : &quot;指定使用致命近战击杀,只会选择地图上的致命近战&quot;,
+&quot;武器击杀&quot; : &quot;指定枪械击杀(消音或未消音)&quot;,
+&quot;事故击杀&quot; : &quot;特定事故击杀,如溺水击杀或触电击杀&quot;,
+&quot;目标杀戮&quot; : &quot;独特的杀戮方式,例如:狙击手-文档中的意思较为模糊&quot;,
+&quot;通用杀戮&quot; : &quot;普通的杀戮方式,例如枪械或事故&quot;,
+&quot;困难杀戮&quot; : &quot;困难的杀戮方式,文档中没有给出具体说明&quot;,
+&quot;附加目标&quot; : &quot;包括其他目标,例如&lt;明日世界&gt;中的DNA病毒原型&quot;,
+&quot;目标伪装&quot; : &quot;为附加目标采取特定的伪装,此请求可以正常工作,无需担心&quot;
+}
+</code></pre>
+]]></content>
+    </entry>
+</feed>
